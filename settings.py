@@ -8,7 +8,7 @@ FONT_NAME = 'arial'
 
 # Player properties
 PLAYER_ACC = 1.2
-PLAYER_FRICTION = -0.3
+PLAYER_FRICTION = -0.2
 PLAYER_GRAV = 0.5
 PLAYER_JUMP = 15
 

@@ -30,27 +30,24 @@ class Game:
         self.player = Player(self, WIDTH / 4, HEIGHT / 4)
         self.all_sprites.add(self.player)
         for row, tiles in enumerate(self.map.data):
-            # tiles = tiles.replace(',', '')
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     map_tile = Tile(self, col, row, GREEN)
                 elif tile == '2':
                     map_tile = Tile(self, col, row, BLUE)
-                # if tile == 'P':
-                #     self.player = Player(self, col, row)
+
         self.camera = Camera(self.map.width, self.map.height)
         self.run()
 
     def run(self):
         # Game Loop
         self.playing = True
-        prev_time = 0
+        prev_time = time.time()
         while self.playing:
             # Compute delta time
             now = time.time()
-            self.dt = round((now - prev_time) * 100, 2)
+            self.dt = round((now - prev_time) * 60, 2)
             prev_time = now
-            # print(self.dt)
             # Set FPS
             self.clock.tick(FPS)
             self.events()
@@ -85,7 +82,6 @@ class Game:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         # self.map_tiles.draw(self.screen)
         # self.player.draw(self.screen)
-        # *after* drawing everything, flip the display?
         pg.display.flip()
 
     def show_start_screen(self):
