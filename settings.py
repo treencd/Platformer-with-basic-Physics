@@ -1,5 +1,5 @@
 # game options/settings
-TITLE = "Jumpy!"
+TITLE = "Platformer"
 WIDTH = 1024 # 32*32
 HEIGHT = 640 # 32 *20
 TILESIZE = 32

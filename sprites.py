@@ -15,6 +15,7 @@ class Player(pg.sprite.Sprite):
         self.height = self.image.get_height()
         self.rect = self.image.get_rect()
         # self.rect.center = (WIDTH / 2, HEIGHT / 4)
+        self.step_size = vec(0, 0)
         self.pos = vec(self.x, self.y)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -45,16 +46,20 @@ class Player(pg.sprite.Sprite):
            #check for collision
             for tile in self.game.map_tiles:
                 #check for collision in x direction
-                if tile.rect.colliderect(self.rect.x + self.vel.x, self.rect.y, self.width, self.height):
+                if tile.rect.colliderect(self.rect.x + self.step_size.x * (60 / FPS), self.rect.y, self.width, self.height):
                     if self.vel.x < 0:
                         self.pos.x = tile.rect.right
+                        print("left collision")
                     elif self.vel.x > 0:
                         self.pos.x = tile.rect.left - self.width
+                        print("right collision")
                 #check for collision in y direction
-                if tile.rect.colliderect(self.rect.x, self.rect.y + self.vel.y, self.width, self.height):
+                if tile.rect.colliderect(self.rect.x, self.rect.y + self.step_size.y * (60 / FPS), self.width, self.height):
                     #check if below the ground i.e. jumping
                     if self.vel.y < 0:
+                        print("top collision")
                         self.pos.y = tile.rect.bottom + self.height
+                        print(tile.rect.bottom)
                         self.vel.y = 0
                     #check if above the ground i.e. falling
                     elif self.vel.y >= 0:
@@ -76,12 +81,12 @@ class Player(pg.sprite.Sprite):
         self.acc = vec(0, PLAYER_GRAV)
         self.get_keys()
         # apply friction
-        self.acc.x += self.vel.x * PLAYER_FRICTION
+        self.acc.x += self.vel.x * PLAYER_FRICTION 
         # equations of motion
-        self.vel += self.acc
-        if abs(self.vel.x) < 0.1:
-            self.vel.x = 0
-        self.pos += self.vel + 0.5 * self.acc  * (FPS / 60)
+        self.vel += self.acc * (60 / FPS) #* round(self.game.dt, 2)
+        if abs(self.vel.x) < 0.1: self.vel.x = 0
+        self.step_size = self.vel + 0.5 * self.acc #* round(self.game.dt/1.65, 2)
+        self.pos += self.step_size * (60 / FPS) #round(self.game.dt, 2) # * (FPS / 60)
         self.collide_with_walls()
         # Map boundaries
         if self.pos.x > self.game.map.width - self.rect.w:
@@ -89,6 +94,7 @@ class Player(pg.sprite.Sprite):
         if self.pos.x < 0:
             self.pos.x = 0
         
+        print(self.pos.y)
         self.rect.bottomleft = self.pos
         self.update_rects()
         

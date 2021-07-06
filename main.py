@@ -48,9 +48,9 @@ class Game:
         while self.playing:
             # Compute delta time
             now = time.time()
-            self.dt = (now - prev_time) * 100
+            self.dt = round((now - prev_time) * 100, 2)
             prev_time = now
-            print(self.dt)
+            # print(self.dt)
             # Set FPS
             self.clock.tick(FPS)
             self.events()
