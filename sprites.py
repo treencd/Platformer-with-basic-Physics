@@ -81,7 +81,7 @@ class Player(pg.sprite.Sprite):
         self.vel += self.acc
         if abs(self.vel.x) < 0.1:
             self.vel.x = 0
-        self.pos += self.vel + 0.5 * self.acc
+        self.pos += self.vel + 0.5 * self.acc  * (FPS / 60)
         self.collide_with_walls()
         # Map boundaries
         if self.pos.x > self.game.map.width - self.rect.w:
