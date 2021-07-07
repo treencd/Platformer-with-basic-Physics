@@ -2,6 +2,12 @@ import pygame as pg
 import csv
 from settings import *
 
+
+''' MAP Class
+* this reads in your map data
+TO DO:
+- switch it to pytmx for reading in layered maps
+'''
 class Map:
     def __init__(self, filename):
         self.data = []
@@ -15,6 +21,10 @@ class Map:
         self.width = self.tilewidth * TILESIZE
         self.height = self.tileheight * TILESIZE
 
+''' CAMERA Class
+* receives a 'target' (the player), as well as the map tiles
+* and moves the tiles at the players current speed relative to the window
+'''
 class Camera:
     def __init__(self, width, height):
         self.camera = pg.Rect(0, 0, width, height)

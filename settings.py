@@ -1,4 +1,5 @@
-# game options/settings
+''' GAME OPTIONS / SETTINGS
+'''
 TITLE = "Platformer"
 WIDTH = 1024 # 32*32
 HEIGHT = 640 # 32 *20

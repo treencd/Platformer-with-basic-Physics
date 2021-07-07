@@ -3,6 +3,9 @@ from settings import *
 vec = pg.math.Vector2
 
 
+'''TILE Class
+* simple object to give each tile a Surface and a Rect
+'''
 class Tile(pg.sprite.Sprite):
     def __init__(self, game, x, y, color):
         self.groups = game.map_tiles, game.all_sprites
@@ -16,7 +19,10 @@ class Tile(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-
+'''PLAYER Class
+* object to give the player a Surface and a Rect as well 
+* as handle motion and collision
+'''
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         pg.sprite.Sprite.__init__(self)
@@ -26,19 +32,16 @@ class Player(pg.sprite.Sprite):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.rect = self.image.get_rect()
-        # self.rect.center = (WIDTH / 2, HEIGHT / 4)
         self.step_size = vec(0, 0)
         self.pos = vec(x, y)
         self.vel = vec(0, 0)
-        self.acc = vec(0, PLAYER_GRAV)
+        self.acc = vec(0, PLAYER_GRAV) # Gravity is set and never changes
         self.on_ground, self.is_jumping = False, False
-        self.LEFT_KEY, self.RIGHT_KEY = False, False
 
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
             self.acc.x = -PLAYER_ACC
-
         if keys[pg.K_RIGHT]:
             self.acc.x = PLAYER_ACC
        
@@ -52,8 +55,8 @@ class Player(pg.sprite.Sprite):
         self.acc.x = 0
         self.get_keys()
         self.acc.x += self.vel.x * PLAYER_FRICTION
-        self.vel.x += self.acc.x * (self.game.dt ** 2)
-        self.pos.x += (self.vel.x * self.game.dt) + (self.acc.x * .5) * (self.game.dt * self.game.dt)
+        self.vel.x += self.acc.x * self.game.dt # v = v_o + a*t
+        self.pos.x += self.vel.x * self.game.dt + (self.acc.x * .5) * (self.game.dt ** 2) # r = r_o + v*t + 0.5*(a*t^2)
         self.rect.x = self.pos.x
         # Map boundaries
         if self.pos.x > self.game.map.width - self.rect.w:
@@ -62,9 +65,9 @@ class Player(pg.sprite.Sprite):
             self.pos.x = 0
 
     def vertical_movement(self):
-        self.vel.y += self.acc.y * self.game.dt
+        self.vel.y += self.acc.y * self.game.dt # v = v_o + a*t
         if self.vel.y > 20: self.vel.y = 20
-        self.pos.y += (self.vel.y * self.game.dt) + (self.acc.y * 0.5) * (self.game.dt * self.game.dt)
+        self.pos.y += self.vel.y * self.game.dt + (self.acc.y * 0.5) * (self.game.dt ** 2)  # r = r_o + v*t + 0.5*(a*t^2)
         self.rect.bottom = self.pos.y
         # Map boundaries
         if self.pos.y > self.game.map.height - self.rect.h:
