@@ -12,6 +12,4 @@
     <li> Semi-ok collision detection :)
 </ul>
 
-![alt text](https://github.com/treencd/Platformer-with-basic-Physics/blob/main/screen.PNG?raw=true)
-
 ![alt text](https://github.com/treencd/Platformer-with-basic-Physics/blob/main/animation.gif)
