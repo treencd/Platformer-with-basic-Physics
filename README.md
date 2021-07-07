@@ -13,4 +13,5 @@
 </ul>
 
 ![alt text](https://github.com/treencd/Platformer-with-basic-Physics/blob/main/screen.PNG?raw=true)
-![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+
+![alt text](https://github.com/treencd/Platformer-with-basic-Physics/blob/main/animation.gif)
