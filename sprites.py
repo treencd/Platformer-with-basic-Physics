@@ -30,65 +30,85 @@ class Player(pg.sprite.Sprite):
         self.step_size = vec(0, 0)
         self.pos = vec(x, y)
         self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
+        self.acc = vec(0, PLAYER_GRAV)
+        self.on_ground, self.is_jumping = False, False
+        self.LEFT_KEY, self.RIGHT_KEY = False, False
 
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
             self.acc.x = -PLAYER_ACC
+
         if keys[pg.K_RIGHT]:
             self.acc.x = PLAYER_ACC
-
-    def collide_with_walls(self):
-           #check for collision
-            for tile in self.game.map_tiles:
-                # check for collision in y direction
-                if tile.rect.colliderect(self.rect.x, self.rect.y + self.step_size.y * self.game.dt, self.width, self.height):
-                    # check if falling
-                    if self.vel.y >= 0:
-                        self.pos.y = tile.rect.top
-                        self.vel.y = 0
-                    # check if jumping
-                    elif self.vel.y < 0:
-                        print("top collision")
-                        self.pos.y = tile.rect.bottom + self.height
-                        print(self.pos.y)
-                        # self.acc = vec(0, PLAYER_GRAV)
-                        self.vel.y = 0
-                #check for collision in x direction
-                elif tile.rect.colliderect(self.rect.x + self.step_size.x * self.game.dt, self.rect.y, self.width, self.height):
-                    if self.vel.x < 0:
-                        self.pos.x = tile.rect.right
-                    elif self.vel.x > 0:
-                        self.pos.x = tile.rect.left - self.width
-                
        
     def jump(self):
-        # jump only if standing on a platform
-        self.jumping = False
-        self.rect.y += 1
-        hits = pg.sprite.spritecollide(self, self.game.map_tiles, False)
-        self.rect.y -= 1
-        if hits:
-            self.jumping = True
-            self.vel.y = -PLAYER_JUMP
+        if self.on_ground:
+            self.is_jumping = True
+            self.vel.y -= PLAYER_JUMP
+            self.on_ground = False
 
-    def update(self):
-        self.acc = vec(0, PLAYER_GRAV)
+    def horizontal_movement(self):
+        self.acc.x = 0
         self.get_keys()
-        # apply friction
-        self.acc.x += self.vel.x * PLAYER_FRICTION 
-        # player movement
-        self.vel += self.acc * (self.game.dt ** 2)
-        if abs(self.vel.x) < 0.1: self.vel.x = 0
-        self.step_size = (self.vel * self.game.dt) + 0.5 * self.acc * (self.game.dt ** 2) 
-        self.pos += self.step_size #* self.game.dt
-        # check for collisions and move pos accordingly
-        self.collide_with_walls()
+        self.acc.x += self.vel.x * PLAYER_FRICTION
+        self.vel.x += self.acc.x * (self.game.dt ** 2)
+        self.pos.x += (self.vel.x * self.game.dt) + (self.acc.x * .5) * (self.game.dt * self.game.dt)
+        self.rect.x = self.pos.x
         # Map boundaries
         if self.pos.x > self.game.map.width - self.rect.w:
             self.pos.x = self.game.map.width - self.rect.w
         if self.pos.x < 0:
             self.pos.x = 0
-        self.rect.bottomleft = self.pos
+
+    def vertical_movement(self):
+        self.vel.y += self.acc.y * self.game.dt
+        if self.vel.y > 20: self.vel.y = 20
+        self.pos.y += (self.vel.y * self.game.dt) + (self.acc.y * 0.5) * (self.game.dt * self.game.dt)
+        self.rect.bottom = self.pos.y
+        # Map boundaries
+        if self.pos.y > self.game.map.height - self.rect.h:
+            self.pos.y = self.game.map.height - self.rect.h
+            self.game.player_death = True
+        if self.pos.y < 0:
+            self.pos.y = 0
+
+    def update(self):
+        self.horizontal_movement()
+        self.check_collisions_x()
+        self.vertical_movement()
+        self.check_collisions_y()
+
+    def get_hits(self):
+        hits = []
+        for tile in self.game.map_tiles:
+            if self.rect.colliderect(tile):
+                hits.append(tile)
+        return hits
+
+    def check_collisions_x(self):
+        collisions = self.get_hits()
+        for tile in collisions:
+            if self.vel.x > 0:  # Hit tile moving right
+                self.pos.x = tile.rect.left - self.rect.w
+                self.rect.x = self.pos.x
+            elif self.vel.x < 0:  # Hit tile moving left
+                self.pos.x = tile.rect.right
+                self.rect.x = self.pos.x
+
+    def check_collisions_y(self):
+        self.on_ground = False
+        self.rect.bottom += 1
+        collisions = self.get_hits()
+        for tile in collisions:
+            if self.vel.y > 0:  # Hit tile from the top
+                self.on_ground = True
+                self.is_jumping = False
+                self.vel.y = 0
+                self.pos.y = tile.rect.top
+                self.rect.bottom = self.pos.y
+            elif self.vel.y < 0:  # Hit tile from the bottom
+                self.vel.y = 0
+                self.pos.y = tile.rect.bottom + self.rect.h
+                self.rect.bottom = self.pos.y
                 

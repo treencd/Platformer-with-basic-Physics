@@ -18,6 +18,8 @@ class Game:
         self.dt = 0.0
         self.running = True
         self.font_name = pg.font.match_font(FONT_NAME)
+        # game monitoring
+        self.player_death = False
         self.load_data()
 
     def load_data(self):
